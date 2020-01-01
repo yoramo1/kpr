@@ -1,0 +1,181 @@
+﻿<Window x:Name="aa" x:Class="wKpr.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:wKpr.VM"
+        xmlns:local="clr-namespace:wKpr"
+        xmlns:utils="clr-namespace:wKpr.Utils"
+        mc:Ignorable="d"
+        Title="wKpr" Height="450" Width="800" Icon="/wKpr;component/Resources/Paomedia-Small-N-Flat-Keyring.ico">
+    <!--
+    <WindowChrome.WindowChrome>
+        <WindowChrome ResizeBorderThickness="6"
+            />
+    </WindowChrome.WindowChrome>
+    -->
+    <Window.Resources>
+        
+        <!--#region Converters-->
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <!--#endregion-->
+
+        <!--#region Brush-->
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" x:Key="autenticateBrush">
+            <GradientStop Color="#FFBCFBBC" Offset="0"/>
+            <GradientStop Color="#FF43FB43" Offset="2"/>
+            <GradientStop Color="#FFC5CBF5" Offset="0.5"/>
+            <GradientStop Color="#FF94F194" Offset="1"/>
+            <GradientStop Color="#FFDEF5DE" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" x:Key="uiBrush">
+            <GradientStop Color="#FF96ABF1" Offset="0"/>
+            <GradientStop Color="White" Offset="0.5"/>
+            <GradientStop Color="#FF9AEE9A" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="ctlBrush" EndPoint="0.5,0" StartPoint="0.5,1">
+            <GradientStop Color="#FFF0B6B6" Offset="0"/>
+            <GradientStop Color="#FFE4EEAE" Offset="0.2"/>
+            <GradientStop Color="#FFC2D6F0" Offset="0.4"/>
+            <GradientStop Color="#FF60DA92" Offset="0.534"/>
+            <GradientStop Color="#FFD6F0D3" Offset="0.734"/>
+            <GradientStop Color="#FF75BEDA" Offset="1"/>
+        </LinearGradientBrush>
+        <!--#endregion-->
+
+        <!--#region Style-->
+        <!--#endregion-->
+
+        <!--#region  Templates-->
+        <DataTemplate DataType="{x:Type vm:OutputMassageVM}">
+            <StackPanel>
+                <TextBlock x:Name="msg" Text="{Binding Message}" FontSize="18"  VerticalAlignment="Center" TextWrapping="Wrap"/>
+            </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Type}" Value="{x:Static vm:MessageType.Error}">
+                    <Setter Property="Background" Value="Red" TargetName="msg"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Type}" Value="{x:Static vm:MessageType.Message}">
+                    <Setter Property="Background" Value="#FF67ADE8" TargetName="msg"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+        <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+        <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
+        <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
+ 
+        <!--#endregion-->
+    </Window.Resources>
+
+
+    <Grid x:Name="main">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid x:Name="ui" 
+              Visibility="{Binding IsAutenticate, ConverterParameter=Visable, Converter={StaticResource BoolToVisibilityConverter}}" 
+              Background="{DynamicResource autenticateBrush}" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel x:Name="toolbar" Grid.Column="1" Grid.Row="0" Orientation="Horizontal" >
+                <Button Content="New"  Command="{Binding cmdNew}"/>
+                <Button Content="{Binding EditText}"  Command="{Binding cmdEdit}"/>
+                <Button Content="Add"  Command="{Binding cmdAdd}"/>
+                <Button Content="Update"  Command="{Binding cmdUpdate}"/>
+                <Button Content="Delete"  Command="{Binding cmdDelete}"/>
+                <Button Content="List"  Command="{Binding cmdList}"/>
+            </StackPanel>
+            <DockPanel  Grid.Row="1" Grid.Column="1">
+                <TextBox Name="search" Text="{Binding FilterPattern,UpdateSourceTrigger=PropertyChanged}" Tag="Search"
+                         DockPanel.Dock="Top" FontSize="16" Foreground="#FF232CEA" Background="#FFF3ABAB" />
+                
+                <ListView x:Name="list" Grid.Column="5" Grid.Row="2" Grid.RowSpan="9" 
+                          ItemsSource="{Binding ItemList}" SelectedItem="{Binding SelectedEntry}" 
+                          Background="Transparent" FontSize="16" IsEnabled="{Binding NotInEditMode}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </DockPanel>
+            <!--#region EntryInfo-->
+            <Grid x:Name="entryInfoGrid"  Grid.Row="1" Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Name" Grid.Column="0"  Grid.Row="1" Style="{DynamicResource TextBlockStyle}" />
+                <TextBox  Grid.Column="2"  Grid.Row="1" Text="{Binding SelectedEntry.Name,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsNameReadOnly}" utils:TextBoxHelperAP.SelectionMode="All"/>
+                <TextBlock Text="User" Grid.Column="0"  Grid.Row="2"/>
+                <TextBox  Grid.Column="2"  Grid.Row="2" Text="{Binding SelectedEntry.User,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsDataReadOnly}" utils:TextBoxHelperAP.SelectionMode="All"/>
+                <TextBlock Text="Pass" Grid.Column="0"  Grid.Row="3"/>
+                <TextBox  Grid.Column="2"  Grid.Row="3" Text="{Binding SelectedEntry.Pass,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsDataReadOnly}" utils:TextBoxHelperAP.SelectionMode="All"/>
+                <TextBlock Text="Link" Grid.Column="0"  Grid.Row="4"/>
+                <TextBox  Grid.Column="2"  Grid.Row="4" Text="{Binding SelectedEntry.Url,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsDataReadOnly}" utils:TextBoxHelperAP.SelectionMode="All"/>
+                <TextBlock Text="Note" Grid.Column="0"  Grid.Row="5"/>
+                <TextBox x:Name="notes"  Grid.Column="2"  Grid.Row="5" Grid.RowSpan="3" Height="auto"
+                         Text="{Binding SelectedEntry.Note}" 
+                         IsReadOnly="{Binding IsDataReadOnly}" 
+                         AcceptsReturn="True" TextWrapping="Wrap" 
+                         VerticalScrollBarVisibility="auto" AcceptsTab="True"/>
+            </Grid>
+            <!--#endregion-->
+        </Grid>
+        <Grid x:Name="Authenticate" Grid.ColumnSpan="7" Grid.RowSpan="8"  
+              Visibility="{Binding IsAutenticate, ConverterParameter=Collapsed, Converter={StaticResource BoolToVisibilityConverter}}" 
+              Background="{StaticResource autenticateBrush}">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="1" Grid.Row="1" Text="File:"/>
+            <TextBox Grid.Column="2" Grid.Row="1" Text="{Binding FilePath}" Grid.ColumnSpan="3"/>
+            <Button Grid.Column="4" Grid.Row="1" Content="..." Command="{Binding cmdBrouse}"/>
+            <TextBlock Grid.Column="1" Grid.Row="2" Text="Pass:"/>
+            <PasswordBox x:Name="passBox" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center"  FontSize="16"/>
+            <Button Grid.Column="3" Grid.Row="3" Content="OK" Command="{Binding cmdAcceptAutentication}" 
+                    CommandParameter="{Binding ElementName=passBox}" 
+                    IsDefault="True"/>
+        </Grid>
+        <ContentPresenter Grid.Row="1" Content="{Binding OutputMessage}"/>
+    </Grid>
+</Window>
